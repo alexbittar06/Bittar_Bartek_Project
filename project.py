@@ -10,13 +10,14 @@ def createGraph(k, sets):
             newGraph[v] = []
     return newGraph
 
-#This function will create the edges
+#This function will create the edges of the grpah
 def add_edge(graph,edges):
     for u,v in edges:
         graph[u].append(v)
         graph[v].append(u)
 
 #This function helps simply the graph, takes in graph as an argument, outputs a simplified graph
+#It implemnets the unit rule of eliminating all other neighbors when a match is found (unit rule)
 def fixGraph(newGraph):
     change = True
     while change:
@@ -35,7 +36,7 @@ def fixGraph(newGraph):
                 del newGraph[v]
     return newGraph
 
-#This function is the matching algorithm, takes in the graph and returns bool
+#This function is the matching algorithm, takes in the graph and returns bool, calls the function that performs rules
 def matchingFunc(newGraph):
     newGraph = fixGraph(newGraph)
     if len(newGraph) == 0:
