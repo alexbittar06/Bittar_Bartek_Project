@@ -47,9 +47,9 @@ def matchingFunc(newGraph):
 
 #test
 if __name__ == "__main__":
-    sets = [[1,2],[3,4],[5,6]]
+    sets =  [[1, 2,], [3, 4], [5, 6]]
     newGraph = createGraph(3, sets)
-    edges = [(1,3),(2,4),(3,5),(4,6)]
+    edges = [(1, 3), (2, 4), (3, 5), (4, 6)]
     add_edge(newGraph,edges)
     result = matchingFunc(newGraph)
     if result:
