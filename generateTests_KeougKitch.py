@@ -83,22 +83,14 @@ def write_graphs_to_csv(sets_perfect, edges_perfect, sets_not_perfect, edges_not
     # Write perfect graph to CSV
     with open('perfect_k_partite_graph.csv', mode='a', newline='') as file:
         writer = csv.writer(file)
-        
-        # Write header if the file is empty
-        if file.tell() == 0:
-            writer.writerow(["Partition Sets (Perfect)", "Edges (Perfect)"])
-        
+            
         # Write graph data
         writer.writerow([sets_perfect, edges_perfect])
     
     # Write non-perfect graph to CSV
     with open('not_perfect_k_partite_graph.csv', mode='a', newline='') as file:
         writer = csv.writer(file)
-        
-        # Write header if the file is empty
-        if file.tell() == 0:
-            writer.writerow(["Partition Sets (Not Perfect)", "Edges (Not Perfect)"])
-        
+                
         # Write graph data
         writer.writerow([sets_not_perfect, edges_not_perfect])
 
@@ -112,7 +104,7 @@ if __name__ == "__main__":
     
     # Range that k will go to
     mink = 2
-    maxk = 130
+    maxk = 120
     
     # Clear files
     clear_file("not_perfect_k_partite_graph.csv")
