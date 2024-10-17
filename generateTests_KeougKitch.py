@@ -120,7 +120,7 @@ if __name__ == "__main__":
 
     for i in range(mink, maxk):
         # Randomize the number of additional edges for this graph
-        additional_edges = random.randint(1, 5)  # Random number of edges between 1 and 5
+        additional_edges = random.randint(3, 7)  # Random number of edges between 1 and 5
 
         # Generate a perfect k-partite graph with additional random edges
         sets_perfect, edges_perfect = create_perfect_k_partite_graph(i, n, additional_edges)
