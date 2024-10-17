@@ -112,7 +112,7 @@ if __name__ == "__main__":
     
     # Range that k will go to
     mink = 2
-    maxk = 15
+    maxk = 130
     
     # Clear files
     clear_file("not_perfect_k_partite_graph.csv")
