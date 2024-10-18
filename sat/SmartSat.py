@@ -37,51 +37,39 @@ wff=[[1,-2,-2],[2,3,3],[-1,-3,-3],[-1,-2,3],[1,2,-3]]
 Num_Clauses=8
 wff=[[-1,-2,-3],[-1,-2,3],[-1,2,-3],[-1,2,3],[1,-2,-3],[1,-2,3],[1,2,-3],[1,2,3]]
 
-
-def check(Wff, Nvars, Nclauses, Assignment):
+def check(Wff,Nvars,Nclauses,Assignment):
+    # Incremental search through all possible assignments for the WFF
     Satisfiable = False
-    # Generate an initial assignment based on the input
-    for i in range(1, Nvars + 1):
-        Assignment[i] = 0  # Start with all variables as False
-
-    while not Satisfiable:
-        # Handle unit clauses first
-        unit_clauses = [clause for clause in Wff if len(clause) == 1]
-        for clause in unit_clauses:
-            literal = clause[0]
-            var_index = abs(literal)
-            if Assignment[var_index] == 0:  # Not assigned yet
-                Assignment[var_index] = 1 if literal > 0 else 0
-
-        # Check if the current assignment satisfies all clauses
+    while True:
+        # Check if the current assignment satisfies the WFF
         Satisfiable = True
-        for i in range(Nclauses):
+        for i in range(Nclauses):  # Check i'th clause
             Clause = Wff[i]
-            ClauseSatisfiable = False
-            for Literal in Clause:
+            ClauseSatisfied = False
+            for Literal in Clause:  # Check each literal in the clause
                 VarValue = Assignment[abs(Literal)]
                 if (Literal > 0 and VarValue == 1) or (Literal < 0 and VarValue == 0):
-                    ClauseSatisfiable = True
+                    ClauseSatisfied = True
                     break
-            if not ClauseSatisfiable:
+            if not ClauseSatisfied:  # If any clause is not satisfied
                 Satisfiable = False
                 break
-        
-        # If satisfiable, break out of the loop
-        if Satisfiable:
-            break
-        
-        # Increment assignment if not satisfied
+
+        if Satisfiable:  # Found a satisfying assignment
+            return True
+
+        # Generate the next assignment using binary increment
         for i in range(1, Nvars + 1):
             if Assignment[i] == 0:
-                Assignment[i] = 1
+                Assignment[i] = 1  # Increment the current variable
                 break
             else:
-                Assignment[i] = 0
-        else:  # If all variables are assigned, stop searching
+                Assignment[i] = 0  # Reset to 0 and move to the next variable
+        else:
+            # If we exit the loop normally (no break), it means we've tried all assignments
             break
 
-    return Satisfiable
+    return False  # No satisfying assignment was found
     
 def build_wff(Nvars,Nclauses,LitsPerClause):
     wff=[]
@@ -105,7 +93,7 @@ def test_wff(wff,Nvars,Nclauses):
 def run_cases(TestCases, ProbNum, tablefile):
     # Open table file to write results
     with open(tablefile + ".csv", 'w') as tablef:
-        tablef.write("Clauses,Time Taken (us),SAT/UNSAT\n")  # Table header
+        tablef.write("Clauses, SAT Time Taken (us), UNSAT Time Taken (us)\n")  # Table header
 
         for i in range(len(TestCases)):
             TestCase = TestCases[i]
@@ -121,12 +109,11 @@ def run_cases(TestCases, ProbNum, tablefile):
                 Exec_Time = results[3]
 
                 if results[2]:  # Satisfiable
-                    y = 'SAT'
+                    # Write SAT time
+                    tablef.write(f"{NClauses*Nvars},{Exec_Time},\n")
                 else:  # Unsatisfiable
-                    y = 'UNSAT'
-
-                # Write the result to the table
-                tablef.write(f"{NClauses*Nvars},{Exec_Time},{y}\n")
+                    # Write UNSAT time
+                    tablef.write(f"{NClauses*Nvars},,{Exec_Time}\n")
 
                 # Increment problem number
                 ProbNum += 1
@@ -176,10 +163,11 @@ TestCases=[
     [24,240,6,10]]
 
 TC2=[
-    [4, 10, 2, 10],  # 4 vars, 10 clauses, 2 literals per clause, 10 trials
-    [8, 16, 2, 10],  # 8 vars, 16 clauses, 2 literals per clause, 10 trials
-    [12, 24, 2, 10], # 12 vars, 24 clauses, 2 literals per clause, 10 trials
-    [16, 32, 2, 10], # 16 vars, 32 clauses, 2 literals per clause, 10 trials
+    [4,10,2,10],
+    [8,16,2,10],
+    [12,24,2,10],
+    [16,32,2,10],
+    [18,36,2,10],
 ]
 # Following generates a bunch of 2 literal wffs
 SAT2=[
