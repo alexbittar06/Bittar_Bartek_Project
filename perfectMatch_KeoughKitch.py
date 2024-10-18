@@ -24,11 +24,10 @@ def fixGraph(newGraph):
         change = False
         removeFrom = []
         for v in list(newGraph.keys()):
-            if len(newGraph[v]) == 0:
-                removeFrom.append(v)
-                change = True
-            elif len(newGraph[v]) == 1:
+            if len(newGraph[v]) == 1:
                 u = newGraph[v][0]
+                if len(newGraph[u]) > 1:
+                    continue
                 removeFrom.append(v)
                 removeFrom.append(u)
                 change = True
@@ -51,24 +50,21 @@ def matchableGraph(v, newGraph, match, visit):
             return True
     return False
 
+
+
 #This function is the matching algorithm, takes in the graph and returns bool, calls the function that performs rules
 def matchingFunc(newGraph):
     newGraph = fixGraph(newGraph)
-    for v in newGraph.keys():
-        if len(newGraph[v]) == 0:
-            return False
+    
+    
 
     match = {}
     for v in newGraph.keys():
         visit = {a: False for a in newGraph.keys()}
-        if not matchableGraph(v,newGraph,match,visit):
-            return False
+        if v not in match:
+            if not matchableGraph(v,newGraph,match,visit):
+                return False
 
-        if len(match) == len(newGraph) //2:
-            return True
-        else:
-            return False
-    
     return True
 
 
@@ -83,13 +79,15 @@ def matchingFunc(newGraph):
 
 #test
 if __name__ == "__main__":
-    sets =  [[1, 2], [3, 4]]
-    newGraph = createGraph(4, sets)
-    edges = [(1, 3), (1, 4), (2, 3), (2, 4)]
+    sets =   [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]
+    newGraph = createGraph(5, sets)
+    edges = [(2, 14), (0, 4), (5, 11), (2, 7), (10, 14), (3, 4), (6, 8), (9, 12), (4, 12), (7, 9), (3, 9), (12, 2), (3, 12), (1, 6), (8, 15), (1, 9)]
     add_edge(newGraph,edges)
     print("Initial Graph:", newGraph)
+    testCase = fixGraph(newGraph)
+    print("Simplified Graph", newGraph)
     result = matchingFunc(newGraph)
-    print("After Graph:", newGraph)
+    
     if result:
         print("Perfect match exists")
     else:
