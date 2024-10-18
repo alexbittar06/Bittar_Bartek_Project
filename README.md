@@ -8,6 +8,7 @@ Names of all team members:
 
 Link to github repository: 
     https://github.com/alexbittar06/Bittar_Bartek_Project
+    *contents are in sat folder NOT bipartite_dropped.
 
 Which project options were attempted: 
     Sat problem 4
