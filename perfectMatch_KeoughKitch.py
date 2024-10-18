@@ -24,7 +24,10 @@ def fixGraph(newGraph):
         change = False
         removeFrom = []
         for v in list(newGraph.keys()):
-            if len(newGraph[v]) == 1:
+            if len(newGraph[v]) == 0:
+                removeFrom.append(v)
+                change = True
+            elif len(newGraph[v]) == 1:
                 u = newGraph[v][0]
                 if len(newGraph[u]) > 1:
                     continue
@@ -79,9 +82,9 @@ def matchingFunc(newGraph):
 
 #test
 if __name__ == "__main__":
-    sets =   [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]
+    sets = [[1, 2], [3, 4], [5, 6]]
     newGraph = createGraph(5, sets)
-    edges = [(2, 14), (0, 4), (5, 11), (2, 7), (10, 14), (3, 4), (6, 8), (9, 12), (4, 12), (7, 9), (3, 9), (12, 2), (3, 12), (1, 6), (8, 15), (1, 9)]
+    edges = [(1, 3), (1, 4), (2, 3), (5, 6)]
     add_edge(newGraph,edges)
     print("Initial Graph:", newGraph)
     testCase = fixGraph(newGraph)
