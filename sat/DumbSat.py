@@ -101,10 +101,10 @@ def run_cases(TestCases, ProbNum, tablefile):
 
                 if results[2]:  # Satisfiable
                     # Write SAT time
-                    tablef.write(f"{NClauses*Nvars},{Exec_Time},\n")
+                    tablef.write(f"{NClauses},{Exec_Time},\n")
                 else:  # Unsatisfiable
                     # Write UNSAT time
-                    tablef.write(f"{NClauses*Nvars},,{Exec_Time}\n")
+                    tablef.write(f"{NClauses},,{Exec_Time}\n")
 
                 # Increment problem number
                 ProbNum += 1
@@ -117,6 +117,17 @@ TestCases = [
     [12,24,2,10],
     [16,32,2,10],
     [18,36,2,10],
+    [4,10,3,10],
+    [8,16,3,10],
+    [12,24,3,10],
+    [16,32,3,10],
+    [18,36,3,10],
+    [4,10,4,10],
+    [8,16,4,10],
+    [12,24,4,10],
+    [16,32,4,10],
+    [18,36,4,10],
+
 ]
 
 ProbNum = 3

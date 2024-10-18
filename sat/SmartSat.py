@@ -1,27 +1,3 @@
-#                    Brute Force SAT
-# This file generates a set of random wffs and tests each for satisfiability.
-#   The test returns "Satisfiable" or not, and the time it took to determine that.
-# A wff is expressed as a list of lists where each internal list is a clause.
-#    and each integer within a clause list is a literal
-#    A positive integer such as "3" means that clause is true if variable 3 is true
-#    A negative integer such as "-3" means that clause is true if variable 3 is false
-#  A clause is satisfiable if at least one literal is true
-#  A wff is satisfiable if all clauses are satisfiable
-# An assignment to n variables is a list of n 0s or 1s (0=>False, 1=>True)
-#    where assignment[i] is value for variable i+1 (there is no variable 0)
-#
-# build_wff builds a random wff with specified # of clauses, variables,
-#   and literals/clause
-# check takes a wff, generates all possible assignments,
-#   and determines if any assignment satisfies it.
-#   If so it stops and returns the time ans assignment
-# test_wff builds a random wff with certain structure
-#
-# run_cases takes a list of 4-tuples and for each one generates a number of wffs
-#    with the same specified characteristices, and test each one.
-#    It outputs to a file (in current directory) each wff in cnf format,
-#    and also for each case it dumps a row to a .csv file that contains
-#       the test conditions and the satisfying assignment if it exists
 
 import time
 import random
@@ -37,37 +13,65 @@ wff=[[1,-2,-2],[2,3,3],[-1,-3,-3],[-1,-2,3],[1,2,-3]]
 Num_Clauses=8
 wff=[[-1,-2,-3],[-1,-2,3],[-1,2,-3],[-1,2,3],[1,-2,-3],[1,-2,3],[1,2,-3],[1,2,3]]
 
-def check(Wff,Nvars,Nclauses,Assignment):
-    # Incremental search through all possible assignments for the WFF
-    Satisfiable = False
-    while True:
-        # Check if the current assignment satisfies the WFF
-        Satisfiable = True
-        for i in range(Nclauses):  # Check i'th clause
-            Clause = Wff[i]
-            ClauseSatisfied = False
-            for Literal in Clause:  # Check each literal in the clause
-                VarValue = Assignment[abs(Literal)]
-                if (Literal > 0 and VarValue == 1) or (Literal < 0 and VarValue == 0):
-                    ClauseSatisfied = True
-                    break
-            if not ClauseSatisfied:  # If any clause is not satisfied
-                Satisfiable = False
-                break
+def check(Wff, Nvars, Nclauses, Assignment):
+    # Create a count of the number of clauses and literal occurrences
+    literal_count = {}
+    unit_clauses = []
 
-        if Satisfiable:  # Found a satisfying assignment
-            return True
-
-        # Generate the next assignment using binary increment
-        for i in range(1, Nvars + 1):
-            if Assignment[i] == 0:
-                Assignment[i] = 1  # Increment the current variable
-                break
+    # First pass: Initialize the counts for literals and identify unit clauses
+    for clause in Wff:
+        if len(clause) == 1:
+            unit_clauses.append(clause[0])
+        for literal in clause:
+            abs_literal = abs(literal)
+            if abs_literal not in literal_count:
+                literal_count[abs_literal] = [0, 0]  # [positive_count, negative_count]
+            if literal > 0:
+                literal_count[abs_literal][0] += 1
             else:
-                Assignment[i] = 0  # Reset to 0 and move to the next variable
+                literal_count[abs_literal][1] += 1
+
+    # Apply Pure Literal Elimination
+    for literal, counts in literal_count.items():
+        if counts[0] > 0 and counts[1] == 0:  # Only positive literals
+            Assignment[literal] = 1
+        elif counts[1] > 0 and counts[0] == 0:  # Only negative literals
+            Assignment[literal] = 0
+
+    # Second pass: Assign values for unit clauses
+    for unit_literal in unit_clauses:
+        var = abs(unit_literal)
+        if unit_literal > 0:
+            Assignment[var] = 1  # Assign true
         else:
-            # If we exit the loop normally (no break), it means we've tried all assignments
+            Assignment[var] = 0  # Assign false
+
+    # Check if current assignment satisfies the WFF
+    Satisfiable = True
+    for clause in Wff:  # Check i'th clause
+        ClauseSatisfied = False
+        for literal in clause:  # Check each literal in the clause
+            VarValue = Assignment[abs(literal)]
+            if (literal > 0 and VarValue == 1) or (literal < 0 and VarValue == 0):
+                ClauseSatisfied = True
+                break
+        if not ClauseSatisfied:  # If any clause is not satisfied
+            Satisfiable = False
             break
+
+    if Satisfiable:  # Found a satisfying assignment
+        return True
+
+    # Generate the next assignment using binary increment
+    for i in range(1, Nvars + 1):
+        if Assignment[i] == 0:
+            Assignment[i] = 1  # Increment the current variable
+            break
+        else:
+            Assignment[i] = 0  # Reset to 0 and move to the next variable
+    else:
+        # If we exit the loop normally (no break), it means we've tried all assignments
+        return False
 
     return False  # No satisfying assignment was found
     
@@ -110,10 +114,10 @@ def run_cases(TestCases, ProbNum, tablefile):
 
                 if results[2]:  # Satisfiable
                     # Write SAT time
-                    tablef.write(f"{NClauses*Nvars},{Exec_Time},\n")
+                    tablef.write(f"{NClauses},{Exec_Time},\n")
                 else:  # Unsatisfiable
                     # Write UNSAT time
-                    tablef.write(f"{NClauses*Nvars},,{Exec_Time}\n")
+                    tablef.write(f"{NClauses},,{Exec_Time}\n")
 
                 # Increment problem number
                 ProbNum += 1
@@ -168,6 +172,16 @@ TC2=[
     [12,24,2,10],
     [16,32,2,10],
     [18,36,2,10],
+    [4,10,3,10],
+    [8,16,3,10],
+    [12,24,3,10],
+    [16,32,3,10],
+    [18,36,3,10],
+    [4,10,4,10],
+    [8,16,4,10],
+    [12,24,4,10],
+    [16,32,4,10],
+    [18,36,4,10],
 ]
 # Following generates a bunch of 2 literal wffs
 SAT2=[
@@ -194,7 +208,7 @@ summaryfile = 'summary_results_smart'  # Name of the summary output file
 
 #run_cases(TC2,ProbNum,resultsfile,tracefile,cnffile)
 #run_cases(SAT2,ProbNum,resultsfile,tracefile,cnffile)
-run_cases(TC2,ProbNum,summaryfile) # This takes a Looong Time!! 40  minutes
+run_cases(TestCases,ProbNum,summaryfile) # This takes a Looong Time!! 40  minutes
 
 
 
