@@ -1,12 +1,9 @@
-import networkx as nx
 import csv
 import random
-import itertools
 
-def create_perfect_k_partite_graph(k, n, additional_edges=0):
+def create_complex_perfect_k_partite_graph(k, n, additional_edges=0):
     """
-    Create a perfect k-partite graph where nodes can only connect to adjacent partitions.
-    Each node has exactly one connection to each adjacent partition.
+    Create a complex perfect k-partite graph where nodes can connect to multiple adjacent partitions.
     
     Parameters:
     k (int): Number of partitions
@@ -20,19 +17,17 @@ def create_perfect_k_partite_graph(k, n, additional_edges=0):
     sets = [list(range(sum([n] * i), sum([n] * (i + 1)))) for i in range(k)]
     
     edges = set()
-    # Connect each partition only to adjacent partitions
-    for i in range(k-1):
-        # Create perfect matching between adjacent partitions
-        # Shuffle the target partition to ensure random but perfect matching
-        target_nodes = sets[i+1].copy()
-        random.shuffle(target_nodes)
-        for node_i, node_j in zip(sets[i], target_nodes):
-            edges.add((node_i, node_j))
+    # Connect each partition to the next in a perfect manner
+    for i in range(k - 1):
+        # Each node in the current partition connects to each node in the next partition
+        for node in sets[i]:
+            for target_node in sets[i + 1]:
+                edges.add((node, target_node))
     
-    # Add additional random edges between adjacent partitions only
+    # Add additional random edges between adjacent partitions
     for _ in range(additional_edges):
         # Select a random partition (except the last one)
-        source_partition = random.randint(0, k-2)
+        source_partition = random.randint(0, k - 2)
         # Get source and target nodes from adjacent partitions
         source_node = random.choice(sets[source_partition])
         target_node = random.choice(sets[source_partition + 1])
@@ -40,10 +35,9 @@ def create_perfect_k_partite_graph(k, n, additional_edges=0):
     
     return sets, edges
 
-def create_not_perfect_k_partite_graph(k, n):
+def create_complex_not_perfect_k_partite_graph(k, n):
     """
-    Create an imperfect k-partite graph by removing some edges
-    between adjacent partitions, breaking the perfect matching.
+    Create an imperfect k-partite graph by removing several edges to ensure it's not perfect.
     
     Parameters:
     k (int): Number of partitions
@@ -52,31 +46,21 @@ def create_not_perfect_k_partite_graph(k, n):
     Returns:
     tuple: (sets, edges)
     """
-    sets, edges = create_perfect_k_partite_graph(k, n)
+    sets, edges = create_complex_perfect_k_partite_graph(k, n)
+
+    # Ensure that at least one edge is removed to make it imperfect
+    # To guarantee non-perfection, we can remove connections to ensure at least one vertex
+    # in the last partition is unmatched.
     
-    # Choose a random partition (except the last one)
-    source_partition = random.randint(0, k-2)
-    
-    # Choose a random node from that partition
-    node_to_disconnect = random.choice(sets[source_partition])
-    
-    # Remove all edges connected to this node
-    edges_to_remove = {(u, v) for u, v in edges 
-                      if u == node_to_disconnect or v == node_to_disconnect}
-    edges.difference_update(edges_to_remove)
-    
+    # Randomly remove edges from the last partition
+    if sets[-1]:  # Check if there are nodes in the last partition
+        unmatched_node = random.choice(sets[-1])
+        edges = {(u, v) for u, v in edges if v != unmatched_node}  # Remove all edges to this node
+
     return sets, edges
 
 def write_graphs_to_csv(sets_perfect, edges_perfect, sets_not_perfect, edges_not_perfect):
-    """
-    Write the perfect and non-perfect graphs to corresponding CSV files.
-    
-    Parameters:
-    sets_perfect (list of lists): List of partitions for the perfect graph
-    edges_perfect (set): Set of edges for the perfect graph
-    sets_not_perfect (list of lists): List of partitions for the non-perfect graph
-    edges_not_perfect (set): Set of edges for the non-perfect graph
-    """
+    """Write the perfect and non-perfect graphs to corresponding CSV files."""
     # Write perfect graph to CSV
     with open('perfect_k_partite_graph.csv', mode='a', newline='') as file:
         writer = csv.writer(file)
@@ -93,25 +77,25 @@ def clear_file(filename):
         pass
 
 if __name__ == "__main__":
-    mink = 2
-    maxk = 6
-    minn = 1
-    maxn = 10
+    mink = 3
+    maxk = 4  # Adjusted to allow k=4
+    minn = 3
+    maxn = 5
     
     # Clear files
     clear_file("not_perfect_k_partite_graph.csv")
     clear_file("perfect_k_partite_graph.csv")
 
-    for k in range(mink,maxk):
+    for k in range(mink, maxk):
         for n in range(minn, maxn):
             # Fewer additional edges since we can only connect adjacent partitions
             additional_edges = random.randint(1, 3)
 
             # Generate graphs
-            sets_perfect, edges_perfect = create_perfect_k_partite_graph(k, n, additional_edges)
-            sets_not_perfect, edges_not_perfect = create_not_perfect_k_partite_graph(k, n)
+            sets_perfect, edges_perfect = create_complex_perfect_k_partite_graph(k, n, additional_edges)
+            sets_not_perfect, edges_not_perfect = create_complex_not_perfect_k_partite_graph(k, n)
             
             # Write to CSV
             write_graphs_to_csv(sets_perfect, edges_perfect, sets_not_perfect, edges_not_perfect)
 
-    print('Perfect and Non-Perfect graphs have been written to CSV files.')
+    print('Complex Perfect and Non-Perfect graphs have been written to CSV files.')
