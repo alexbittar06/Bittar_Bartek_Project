@@ -203,7 +203,7 @@ ProbNum = 3
 resultsfile = r'resultsfile'
 tracefile = r'tracefile'
 cnffile = r'cnffile'# Each of these list entries describes a series of random wffs to generate
-summaryfile = 'summary_results_smart'  # Name of the summary output file
+summaryfile = 'smartOutput_KeoughKitch'  # Name of the summary output file
 
 
 #run_cases(TC2,ProbNum,resultsfile,tracefile,cnffile)

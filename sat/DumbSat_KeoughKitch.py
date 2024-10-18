@@ -134,7 +134,7 @@ ProbNum = 3
 resultsfile = r'resultsfile'
 tracefile = r'tracefile'
 cnffile = r'cnffile'
-summaryfile = 'summary_results'  # Name of the summary output file
+summaryfile = 'dumbOutput_KeoughKitch'  # Name of the summary output file
 
 # Run the function with the test cases
 run_cases(TestCases, ProbNum, summaryfile)
